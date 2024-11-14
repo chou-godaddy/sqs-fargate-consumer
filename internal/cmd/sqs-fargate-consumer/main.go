@@ -28,11 +28,11 @@ func main() {
 	cfg := &consumer.Config{
 		QueueURL:             "https://sqs.us-west-2.amazonaws.com/982600293865/sqs-fargate-consumer-eventqueue",
 		InitialWorkerCount:   5,
-		MaxWorkerCount:       20,
+		MaxWorkerCount:       100,
 		MinWorkerCount:       2,
 		ScaleUpThreshold:     50,
 		ScaleDownThreshold:   10,
-		CooldownPeriod:       5 * time.Minute,
+		CooldownPeriod:       30 * time.Second,
 		TargetProcessingTime: 30 * time.Second,
 	}
 

@@ -23,7 +23,7 @@ func NewScaler(collector *MetricsCollector, consumer *Consumer, config *Config) 
 }
 
 func (s *Scaler) Start(ctx context.Context) {
-	ticker := time.NewTicker(30 * time.Second)
+	ticker := time.NewTicker(5 * time.Second)
 	defer ticker.Stop()
 
 	for {
