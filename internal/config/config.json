@@ -1,0 +1,76 @@
+{
+    "apiName": "sqs-fargate-consumer",
+    "env": "{{.Env}}",
+    "region": "{{.Region}}",
+    "logging": {
+      "app": "sqs-fargate-consumer",
+      "enabled": true,
+      "level": "INFO",
+      "json": true
+    },
+    "monitoring": {
+      "enabled": false,
+      "APMSecret": "essp_apm_deployment"
+    },
+    "httpConfig": {
+      "MaxConnections": 100,
+      "TimeoutMs": 90000,
+      "APMEnabled": false
+    },
+    "sso": {
+      "url": {{if eq .Env "dev"}}"https://sso.dev-godaddy.com"{{ else if eq .Env "test" }}"https://sso.test-godaddy.com"{{ else if eq .Env "prod" }}"https://sso.godaddy.com"{{ else if eq .Env "ote" }}"https://sso.ote-godaddy.com"{{ end }},
+      "expireLevel": 1,
+      "commonNames": {
+      "registrar.{{.Env}}.client.int.godaddy.com": "registrar services client cert"
+      },
+      "iamClientConfig": {
+        "ssoURL": {{if eq .Env "dev"}}"sso.dev-godaddy.com"{{ else if eq .Env "dev-private"}}"sso.dev-godaddy.com"{{ else if eq .Env "test" }}"sso.test-godaddy.com"{{ else if eq .Env "prod" }}"sso.godaddy.com"{{ else if eq .Env "ote" }}"sso.ote-godaddy.com"{{ end }},
+        "primaryRegion": {{if eq .Env "dev"}}"us-west-2"{{ else if eq .Env "dev-private" }}"us-west-2"{{ else if eq .Env "test" }}"us-west-2"{{ else if eq .Env "prod" }}"{{.Region}}"{{ else if eq .Env "ote" }}"{{.Region}}"{{ end }},
+        "secondaryRegions": [{{ if eq .Region "us-west-2"}}"us-east-1"{{ else }}"us-west-2"{{ end }}]
+      },
+      "pkCacheConfig": {
+        "memcached": {
+           "clusterName": "sso-pk-cache"
+        }
+      }
+    },
+    "certConfig": {
+        "Cert": {
+          "AWS": {
+            "Name": "registrar.{{.Env}}.client.int.godaddy.com.crt",
+            "Region": "{{.Region}}"
+          }
+        },
+        "Key": {
+          "AWS": {
+            "Name": "registrar.{{.Env}}.client.int.godaddy.com.key",
+            "Region": "{{.Region}}"
+          }
+        },
+        "Chain": {
+          "AWS": {
+            "Name": "registrar.{{.Env}}.client.int.godaddy.com_intermediate_chain.crt",
+            "Region": "{{.Region}}"
+          }
+        },
+        "Root": {
+          "AWS": {
+            "Name": "ca-bundle.crt",
+            "Region": "{{.Region}}"
+          }
+        }
+    },
+    "minWorkers": 2,
+    "maxWorkers": 20,
+    "scaleUpCooldown": 1,
+    "scaleDownCooldown": 5,
+    "metricsInterval": 15,
+    "maxErrorThreshold": 100,
+    "errorWindowDuration": 5,
+    "maxProcessingTime": 5,
+    "visibilityTimeout": 300,
+    "maxRetries": 3,
+    "maxMessages": 10,
+    "waitTimeSeconds": 20,
+    "queueUrl": "https://sqs.{{.Region}}.amazonaws.com/123456789012/sqs-fargate-consumer-queue"
+  }

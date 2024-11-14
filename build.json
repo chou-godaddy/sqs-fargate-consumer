@@ -1,0 +1,74 @@
+
+{
+    "mocks": [
+    ],
+    "release": {
+      "type": "git",
+      "aws_account": {
+        "dev": "982600293865",
+        "test": "550131454132",
+        "prod": "047150981913",
+        "ote": "247530626458",
+        "dev-private": "846953831272"
+      },
+      "app-name": "sqs-fargate-consumer",
+      "team_prefix": "rg0",
+      "project_code": "rg0",
+      "tagging": {
+        "prod": {
+          "increment": "MINOR",
+          "release": true
+        }
+      },
+      "builds": [
+        {
+          "type": "docker",
+          "name": "sqs-fargate-consumer",
+          "dockerName": "sqs-fargate-consumer",
+          "generate-dockerfile": true,
+          "baseImage": "alpine:latest",
+          "dockerPlatform": "linux/amd64",
+          "entryPoint": "internal/cmd/sqs-fargate-consumer/main.go",
+          "files": {
+            "build/docker/sqs-fargate-consumer": "/go/bin/sqs-fargate-consumer",
+             "internal/config/config.json": "/go/bin/internal/config/config.json"
+          },
+          "steps": [
+            {
+              "type": "aws-deployment",
+              "regions": ["us-west-2"]
+            },
+            {
+              "type": "standard-fargate-deployment",
+              "regions": ["us-west-2"],
+              "soap_service": true,
+              "hosted_zone": "fulfillment.domains.{env_dns}.aws.gdcld.net",
+              "test_path": "internal/integration",
+              "app_encryption": false,
+              "fargate_min_containers": {
+                "dev": "1",
+                "test": "1",
+                "ote": "1",
+                "prod": "1"
+              },
+              "fargate_desired_containers": {
+                "dev": "1",
+                "test": "1",
+                "ote": "1",
+                "prod": "1"
+              },
+              "fargate_cpu": {
+                "prod": "512"
+              },
+              "fargate_memory": {
+                "prod": "1GB"
+              },
+              "fargate_custom_task_role": "sqs-fargate-consumer-FargateTaskRole",
+              "skip_tests": true
+            }
+          ]
+        }
+      ]
+    }
+  }
+  
